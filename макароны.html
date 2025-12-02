@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Мессенджер Макс - Загрузка</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: relative;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+        }
+        
+        body {
+            color: white;
+            min-height: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 4rem;
+            color: #00a8ff;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 15px rgba(0, 168, 255, 0.5));
+            animation: pulse 2s infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .logo-image {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+        }
+        
+        .logo h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #00a8ff, #0097e6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .logo p {
+            font-size: 1rem;
+            opacity: 0.8;
+            padding: 0 10px;
+        }
+        
+        .loading-container {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+            flex: 1;
+        }
+        
+        .loading-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .loading-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            flex: 1;
+        }
+        
+        .percentage {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #00a8ff;
+            margin-bottom: 10px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 16px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #00a8ff, #0097e6);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .loading-details {
+            margin-bottom: 30px;
+        }
+        
+        .loading-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .loading-step.active {
+            background-color: rgba(0, 168, 255, 0.1);
+            border-left: 4px solid #00a8ff;
+        }
+        
+        .loading-step.completed .step-icon {
+            background-color: #00a8ff;
+        }
+        
+        .step-icon {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1rem;
+        }
+        
+        .step-text {
+            flex-grow: 1;
+        }
+        
+        .step-text h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .step-text p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        
+        .cancel-btn {
+            background: linear-gradient(to right, #ff4757, #ff3838);
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 71, 87, 0.3);
+            margin: 0 auto;
+            width: 100%;
+            max-width: 280px;
+            touch-action: manipulation;
+        }
+        
+        .cancel-btn:hover, .cancel-btn:active {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 71, 87, 0.5);
+        }
+        
+        .cancel-btn i {
+            font-size: 1.3rem;
+        }
+        
+        .loading-time {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        .time-warning {
+            color: #ffcc00;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .groan-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .groan-text {
+            font-size: 3rem;
+            color: #ff4757;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: groanText 2s infinite alternate;
+            line-height: 1.2;
+        }
+        
+        .groan-subtext {
+            font-size: 1.2rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            opacity: 0.8;
+            line-height: 1.4;
+            padding: 0 10px;
+        }
+        
+        .restart-btn {
+            background-color: #00a8ff;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            touch-action: manipulation;
+        }
+        
+        .restart-btn:hover, .restart-btn:active {
+            background-color: #0097e6;
+            transform: scale(1.05);
+        }
+        
+        .sound-wave {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 30px;
+            height: 50px;
+        }
+        
+        .sound-bar {
+            width: 6px;
+            height: 15px;
+            background-color: #ff4757;
+            border-radius: 4px;
+            animation: soundWave 1.2s ease infinite;
+        }
+        
+        .sound-bar:nth-child(2) { animation-delay: 0.1s; }
+        .sound-bar:nth-child(3) { animation-delay: 0.2s; }
+        .sound-bar:nth-child(4) { animation-delay: 0.3s; }
+        .sound-bar:nth-child(5) { animation-delay: 0.4s; }
+        .sound-bar:nth-child(6) { animation-delay: 0.5s; }
+        .sound-bar:nth-child(7) { animation-delay: 0.6s; }
+        .sound-bar:nth-child(8) { animation-delay: 0.7s; }
+        
+        .loop-indicator {
+            background-color: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .redirect-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            flex-direction: column;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .redirect-content {
+            max-width: 500px;
+        }
+        
+        .redirect-icon {
+            font-size: 5rem;
+            color: #00a8ff;
+            margin-bottom: 20px;
+            animation: pulse 1s infinite;
+        }
+        
+        .redirect-text {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #00a8ff;
+            margin-bottom: 20px;
+        }
+        
+        .redirect-subtext {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+        
+        .countdown {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffcc00;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background: rgba(255, 204, 0, 0.1);
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        .download-btn {
+            background: linear-gradient(to right, #00a8ff, #0097e6);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 168, 255, 0.3);
+            margin: 20px auto 0;
+            text-decoration: none;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 168, 255, 0.5);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes groanText {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        @keyframes soundWave {
+            0% { height: 15px; }
+            50% { height: 40px; }
+            100% { height: 15px; }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .container {
+                padding: 5px;
+            }
+            
+            .logo-icon {
+                font-size: 3rem;
+            }
+            
+            .logo-image {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .logo h1 {
+                font-size: 2rem;
+            }
+            
+            .logo p {
+                font-size: 0.9rem;
+            }
+            
+            .loading-container {
+                padding: 20px;
+                border-radius: 15px;
+            }
+            
+            .loading-text {
+                font-size: 1.1rem;
+            }
+            
+            .percentage {
+                font-size: 1.5rem;
+            }
+            
+            .progress-container {
+                height: 14px;
+            }
+            
+            .step-icon {
+                width: 32px;
+                height: 32px;
+                min-width: 32px;
+                font-size: 0.9rem;
+            }
+            
+            .step-text h3 {
+                font-size: 1rem;
+            }
+            
+            .step-text p {
+                font-size: 0.8rem;
+            }
+            
+            .groan-text {
+                font-size: 2.2rem;
+                letter-spacing: 2px;
+            }
+            
+            .groan-subtext {
+                font-size: 1rem;
+            }
+            
+            .cancel-btn {
+                padding: 14px 25px;
+                font-size: 1rem;
+            }
+            
+            .redirect-text {
+                font-size: 1.5rem;
+            }
+            
+            .redirect-subtext {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-height: 700px) {
+            .logo {
+                margin-bottom: 20px;
+            }
+            
+            .logo-icon {
+                font-size: 3rem;
+                margin-bottom: 10px;
+            }
+            
+            .logo-image {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .loading-container {
+                padding: 20px;
+            }
+            
+            .loading-details {
+                margin-bottom: 20px;
+            }
+            
+            .loading-step {
+                margin-bottom: 12px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <div class="logo-icon">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Max_logo_2025.png" alt="Логотип Макс" class="logo-image">
+            </div>
+            <h1>Макс</h1>
+            <p>Новый мессенджер для общения без границ</p>
+        </div>
+        
+        <div class="loading-container">
+            <div class="loading-header">
+                <div class="loading-text">Установка Мессенджера "Макс"</div>
+                <div class="percentage" id="percentage">0%</div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            
+            <div class="loading-details">
+                <div class="loading-step active" id="step1">
+                    <div class="step-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <div class="step-text">
+                        <h3>Загрузка файлов</h3>
+                        <p>Скачивание основных компонентов (5/25 МБ)</p>
+                    </div>
+                </div>
+                
+                <div class="loading-step" id="step2">
+                    <div class="step-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="step-text">
+                        <h3>Установка компонентов</h3>
+                        <p>Распаковка и настройка модулей</p>
+                    </div>
+                </div>
+                
+                <div class="loading-step" id="step3">
+                    <div class="step-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="step-text">
+                        <h3>Настройка базы данных</h3>
+                        <p>Создание и инициализация хранилища</p>
+                    </div>
+                </div>
+                
+                <div class="loading-step" id="step4">
+                    <div class="step-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="step-text">
+                        <h3>Завершение установки</h3>
+                        <p>Финальная настройка и запуск</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="cancel-btn" id="cancel-btn">
+                <i class="fas fa-times-circle"></i>
+                Отменить установку
+            </button>
+            
+            <div class="loading-time" id="loading-time">
+                <div>Осталось примерно: <span id="time-left">30 секунд</span></div>
+                <div class="time-warning">Не закрывайте это окно во время установки</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="groan-overlay" id="groan-overlay">
+        <div class="sound-wave">
+            <div class="sound-bar"></div>
+            <div class="sound-bar"></div>
+            <div class="sound-bar"></div>
+            <div class="sound-bar"></div>
+            <div class="sound-bar"></div>
+            <div class="sound-bar"></div>
+            <div class="sound-bar"></div>
+            <div class="sound-bar"></div>
+        </div>
+        
+        <div class="groan-text">Ооооххх...</div>
+        <div class="groan-subtext">Установка мессенджера отменена</div>
+        
+        <div class="loop-indicator">
+            <i class="fas fa-redo"></i>
+            <span>Звук повторяется до перезапуска</span>
+        </div>
+        
+        <button class="restart-btn" id="restart-btn">
+            <i class="fas fa-redo"></i> Установить ещё раз
+        </button>
+    </div>
+    
+    <div class="redirect-overlay" id="redirect-overlay">
+        <div class="redirect-content">
+            <div class="redirect-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="redirect-text">Установка завершена!</div>
+            <div class="redirect-subtext">
+                Мессенджер "Макс" успешно установлен на ваше устройство.
+                <br>Сейчас начнется загрузка установочного файла.
+            </div>
+            <div class="countdown" id="countdown">5</div>
+            <div class="redirect-subtext">
+                Автоматический переход через: <span id="countdown-seconds">5</span> секунд
+            </div>
+            <a href="https://trk.mail.ru/c/h172vv5" class="download-btn" id="download-btn" target="_blank">
+                <i class="fas fa-download"></i> Скачать установочный файл
+            </a>
+            <div style="margin-top: 20px; font-size: 0.9rem; opacity: 0.7;">
+                Если переход не произошел автоматически, нажмите кнопку выше
+            </div>
+        </div>
+    </div>
+    
+    <!-- Аудио элемент с вашим URL -->
+    <audio id="groan-audio" preload="auto">
+        <source src="https://www.myinstants.com/media/sounds/stony-777.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        // Ждем полной загрузки DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы DOM
+            const progressBar = document.getElementById('progress-bar');
+            const percentage = document.getElementById('percentage');
+            const cancelBtn = document.getElementById('cancel-btn');
+            const groanOverlay = document.getElementById('groan-overlay');
+            const restartBtn = document.getElementById('restart-btn');
+            const groanAudio = document.getElementById('groan-audio');
+            const timeLeft = document.getElementById('time-left');
+            const redirectOverlay = document.getElementById('redirect-overlay');
+            const countdownElement = document.getElementById('countdown');
+            const countdownSeconds = document.getElementById('countdown-seconds');
+            const downloadBtn = document.getElementById('download-btn');
+            
+            // Шаги установки
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            const step3 = document.getElementById('step3');
+            const step4 = document.getElementById('step4');
+            
+            // Константы
+            const TOTAL_TIME = 30; // 30 секунд на установку
+            const REDIRECT_URL = "https://trk.mail.ru/c/h172vv5"; // Ссылка для скачивания
+            const REDIRECT_COUNTDOWN = 5; // 5 секунд отсчета перед редиректом
+            
+            // Переменные состояния
+            let progress = 0;
+            let loadingInterval;
+            let timeRemaining = TOTAL_TIME; // секунд
+            let isGroaning = false; // флаг, что стон играет
+            let audioInterval; // интервал для повторения звука
+            let redirectCountdown = REDIRECT_COUNTDOWN;
+            let redirectInterval;
+            
+            // Функция обновления прогресса
+            function updateProgress() {
+                // Увеличиваем прогресс пропорционально времени
+                progress += 100 / (TOTAL_TIME * 5); // 5 раз в секунду * 30 секунд = 150 обновлений
+                if (progress > 100) progress = 100;
+                
+                // Обновление оставшегося времени
+                timeRemaining = Math.max(0, TOTAL_TIME - Math.floor(progress / 100 * TOTAL_TIME));
+                timeLeft.textContent = timeRemaining + ' секунд';
+                
+                // Обновление элементов интерфейса
+                progressBar.style.width = progress + '%';
+                percentage.textContent = Math.round(progress) + '%';
+                
+                // Обновление шагов установки
+                updateSteps();
+                
+                // Если загрузка завершена
+                if (progress >= 100) {
+                    clearInterval(loadingInterval);
+                    showRedirectScreen();
+                }
+            }
+            
+            // Функция обновления шагов установки
+            function updateSteps() {
+                // Сброс всех шагов
+                step1.classList.remove('completed', 'active');
+                step2.classList.remove('completed', 'active');
+                step3.classList.remove('completed', 'active');
+                step4.classList.remove('completed', 'active');
+                
+                // Установка состояний в зависимости от прогресса
+                if (progress >= 25) {
+                    step1.classList.add('completed');
+                    step2.classList.add('active');
+                } else {
+                    step1.classList.add('active');
+                }
+                
+                if (progress >= 50) {
+                    step2.classList.add('completed');
+                    step3.classList.add('active');
+                }
+                
+                if (progress >= 75) {
+                    step3.classList.add('completed');
+                    step4.classList.add('active');
+                }
+                
+                if (progress >= 100) {
+                    step4.classList.add('completed');
+                }
+            }
+            
+            // Функция сброса загрузки
+            function resetLoading() {
+                progress = 0;
+                progressBar.style.width = '0%';
+                percentage.textContent = '0%';
+                timeRemaining = TOTAL_TIME;
+                timeLeft.textContent = TOTAL_TIME + ' секунд';
+                
+                // Останавливаем звук
+                stopGroanSound();
+                
+                // Сброс шагов
+                step1.classList.remove('completed', 'active');
+                step2.classList.remove('completed', 'active');
+                step3.classList.remove('completed', 'active');
+                step4.classList.remove('completed', 'active');
+                
+                step1.classList.add('active');
+                
+                // Запуск новой загрузки
+                startLoading();
+            }
+            
+            // Функция запуска загрузки
+            function startLoading() {
+                if (loadingInterval) clearInterval(loadingInterval);
+                loadingInterval = setInterval(updateProgress, 200); // 5 раз в секунду
+            }
+            
+            // Функция показа экрана редиректа
+            function showRedirectScreen() {
+                // Останавливаем звук если играет
+                stopGroanSound();
+                
+                // Показываем экран редиректа
+                redirectOverlay.style.display = 'flex';
+                redirectCountdown = REDIRECT_COUNTDOWN;
+                countdownElement.textContent = redirectCountdown;
+                countdownSeconds.textContent = redirectCountdown;
+                
+                // Запускаем отсчет
+                redirectInterval = setInterval(() => {
+                    redirectCountdown--;
+                    countdownElement.textContent = redirectCountdown;
+                    countdownSeconds.textContent = redirectCountdown;
+                    
+                    if (redirectCountdown <= 0) {
+                        clearInterval(redirectInterval);
+                        performRedirect();
+                    }
+                }, 1000);
+            }
+            
+            // Функция выполнения редиректа
+            function performRedirect() {
+                // Открываем ссылку в новом окне/вкладке
+                window.open(REDIRECT_URL, '_blank');
+                
+                // Показываем сообщение о успешном переходе
+                countdownElement.textContent = "✓";
+                countdownElement.style.color = "#00ff00";
+                countdownElement.style.animation = "none";
+                
+                // Меняем текст
+                const redirectSubtext = document.querySelector('.redirect-subtext');
+                if (redirectSubtext) {
+                    redirectSubtext.innerHTML = 
+                        "Ссылка для скачивания открыта в новом окне.<br>Если окно не открылось, нажмите кнопку ниже еще раз.";
+                }
+            }
+            
+            // Функция для воспроизведения звука стона с повторением
+            function playGroanSound() {
+                if (isGroaning) return;
+                
+                isGroaning = true;
+                
+                // Сначала попробуем воспроизвести звук
+                groanAudio.currentTime = 0;
+                
+                // Создаем промис для воспроизведения звука
+                const playPromise = groanAudio.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        console.log("Звук успешно начал воспроизводиться");
+                        
+                        // Запускаем интервал для повторения звука
+                        audioInterval = setInterval(() => {
+                            groanAudio.currentTime = 0;
+                            groanAudio.play().catch(e => {
+                                console.log("Ошибка при повторном воспроизведении:", e);
+                            });
+                        }, 2000); // 2 секунды - длительность вашего звука
+                        
+                    }).catch(error => {
+                        console.log("Ошибка воспроизведения звука:", error);
+                        // Если автовоспроизведение заблокировано, покажем сообщение
+                        if (error.name === 'NotAllowedError') {
+                            const message = document.createElement('div');
+                            message.innerHTML = `
+                                <div style="color: #ffcc00; margin: 10px 0; padding: 10px; background: rgba(255,204,0,0.1); border-radius: 10px;">
+                                    <i class="fas fa-volume-mute"></i> 
+                                    Автовоспроизведение звука заблокировано браузером.
+                                    <br>Нажмите в любом месте экрана, чтобы включить звук.
+                                </div>
+                            `;
+                            groanOverlay.insertBefore(message, groanOverlay.querySelector('.groan-subtext'));
+                        }
+                    });
+                }
+            }
+            
+            // Функция остановки звука
+            function stopGroanSound() {
+                if (isGroaning) {
+                    groanAudio.pause();
+                    groanAudio.currentTime = 0;
+                    clearInterval(audioInterval);
+                    isGroaning = false;
+                }
+            }
+            
+            // Обработчик кнопки отмены
+            function cancelHandler() {
+                // Остановка загрузки
+                clearInterval(loadingInterval);
+                
+                // Воспроизведение стона с повторением
+                playGroanSound();
+                
+                // Показать экран с стоном
+                groanOverlay.style.display = 'flex';
+                
+                // Добавить эффект тряски кнопки
+                cancelBtn.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    cancelBtn.style.animation = '';
+                }, 500);
+            }
+            
+            // Обработчик кнопки перезапуска
+            function restartHandler() {
+                // Скрыть экран с стоном
+                groanOverlay.style.display = 'none';
+                
+                // Перезапустить загрузку
+                resetLoading();
+            }
+            
+            // Обработчик кнопки скачивания
+            function downloadHandler(e) {
+                e.preventDefault();
+                performRedirect();
+            }
+            
+            // Начало загрузки
+            startLoading();
+            
+            // Добавляем обработчики событий
+            cancelBtn.addEventListener('click', cancelHandler);
+            restartBtn.addEventListener('click', restartHandler);
+            downloadBtn.addEventListener('click', downloadHandler);
+            
+            // Добавляем обработчик для тач-устройств (для лучшей реакции)
+            cancelBtn.addEventListener('touchstart', function() {
+                this.style.transform = 'translateY(-1px)';
+            });
+            
+            cancelBtn.addEventListener('touchend', function() {
+                this.style.transform = 'translateY(0)';
+            });
+            
+            // Добавляем обработчик клика по экрану для включения звука
+            document.addEventListener('click', function enableAudio() {
+                // Если звук должен играть, но не играет из-за политики браузера
+                if (isGroaning && groanAudio.paused) {
+                    groanAudio.play().then(() => {
+                        console.log("Звук включен после клика пользователя");
+                    }).catch(e => {
+                        console.log("Ошибка при включении звука:", e);
+                    });
+                }
+            });
+            
+            // Добавление CSS анимации тряски
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                    20%, 40%, 60%, 80% { transform: translateX(5px); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Предотвращаем контекстное меню на кнопках (мешает на мобильных)
+            cancelBtn.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+        });
+    </script>
+</body>
+</html>
